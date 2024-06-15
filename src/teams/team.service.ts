@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 
 import { Team } from './team.entity';
 import { teamDto } from './team.dto';
-import { User } from 'src/users/user.entity';
+import { User } from '../../src/users/user.entity'; //updated777
 
 @Injectable()
 export class TeamService {
@@ -49,7 +49,7 @@ export class TeamService {
   }
 
   async update(id: number, payload: teamDto) {
-    const team = await this.teamRepo.findOneBy({ id });
+    const team = await this.teamRepo.findOne(id as any); //updated777
     if (!team) {
       throw new NotFoundException(`Team #${id} not found`);
     }

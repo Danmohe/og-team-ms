@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 
 import { Project } from './projects.entity';
 import { projectDto } from './projects.dto';
-import { TeamService } from 'src/teams/team.service';
+import { TeamService } from '../../src/teams/team.service';
 
 @Injectable()
 export class ProjectsService {

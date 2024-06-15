@@ -8,11 +8,11 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { User } from 'src/users/user.entity';
-import { Project } from 'src/projects/projects.entity';
-import { Comment } from 'src/comments/comment.entity';
+import { User } from '../../src/users/user.entity';
+import { Project } from '../../src/projects/projects.entity';
+import { Comment } from '../../src/comments/comment.entity';
 
-enum TaskStatus {
+export enum TaskStatus {
   PENDING = 'pendiente',
   IN_PROGRESS = 'en progreso',
   COMPLETED = 'finalizada',

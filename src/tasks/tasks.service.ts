@@ -8,9 +8,9 @@ import { Repository, FindOptionsWhere, ILike } from 'typeorm';
 
 import { Task } from './tasks.entity';
 import { taskDto, updateTaskDto, FilterTasksDto } from './tasks.dto';
-import { ProjectsService } from 'src/projects/projects.service';
+import { ProjectsService } from '../../src/projects/projects.service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { UserService } from 'src/users/user.service';
+import { UserService } from '../../src/users/user.service';
 
 @Injectable()
 export class TasksService {

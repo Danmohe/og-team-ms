@@ -7,8 +7,8 @@ import {
   ManyToOne,
 } from 'typeorm';
 
-import { User } from 'src/users/user.entity';
-import { Task } from 'src/tasks/tasks.entity';
+import { User } from '../../src/users/user.entity';
+import { Task } from '../../src/tasks/tasks.entity';
 
 @Entity('comments')
 export class Comment {

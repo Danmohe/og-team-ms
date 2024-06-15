@@ -8,8 +8,8 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { User } from 'src/users/user.entity';
-import { Project } from 'src/projects/projects.entity';
+import { User } from '../../src/users/user.entity';
+import { Project } from '../../src/projects/projects.entity';
 
 @Entity('teams')
 export class Team {

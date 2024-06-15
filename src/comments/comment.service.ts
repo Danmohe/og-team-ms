@@ -6,8 +6,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm/dist';
 import { Repository } from 'typeorm';
 
-import { UserService } from 'src/users/user.service';
-import { TasksService } from 'src/tasks/tasks.service';
+import { UserService } from '../../src/users/user.service';
+import { TasksService } from '../../src/tasks/tasks.service';
 
 import { Comment } from './comment.entity';
 import { commentDto } from './comment.dto';

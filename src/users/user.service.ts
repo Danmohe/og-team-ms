@@ -38,15 +38,18 @@ export class UserService {
     });
   }
 
-  async update(userName: string, payload: userDto) {
+  async update(userName: string, payload: Partial<User>): Promise<User> {
     const user = await this.userRepo.findOneBy({ userName });
     if (!user) {
-      throw new NotFoundException(`User ${userName} not found`);
+      throw new NotFoundException(`User with username ${userName} not found`);
     }
-    this.userRepo.merge(user, payload);
-    return await this.userRepo.save(user).catch((error) => {
+    const mergedUser = this.userRepo.merge(user, payload);
+    console.log('Service merge result:', mergedUser); // Debug log
+    try {
+      return await this.userRepo.save(mergedUser);
+    } catch (error: any) {
       throw new ConflictException(error.detail);
-    });
+    }
   }
 
   async delete(userName: string) {

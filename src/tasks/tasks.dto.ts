@@ -42,38 +42,38 @@ export class updateTaskDto {
   @IsNotEmpty()
   @IsString()
   @IsOptional()
-  readonly name: string;
+  readonly name?: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @IsOptional()
-  readonly description: string;
+  readonly description?: string;
 
   @ApiProperty()
   @IsString()
   @IsOptional()
-  readonly responsableUser: string;
+  readonly responsableUser?: string;
 
   @ApiProperty({ type: 'boolean' })
   @IsBoolean()
   @IsOptional()
-  readonly deleted: boolean;
+  readonly deleted?: boolean;
 
   @ApiProperty({ type: 'timestamptz' })
   @IsString()
   @IsOptional()
-  readonly startDate: string;
+  readonly startDate?: string;
 
   @ApiProperty({ type: 'timestamptz' })
   @IsString()
   @IsOptional()
-  readonly endDate: string;
+  readonly endDate?: string;
 
   @ApiProperty()
   @IsString()
   @IsOptional()
-  readonly status: TaskStatus;
+  readonly status?: TaskStatus;
 }
 
 enum TaskStatus {
