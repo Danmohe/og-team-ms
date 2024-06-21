@@ -95,6 +95,10 @@ describe('ProjectsService', () => {
       expect(result).toEqual(project);
       expect(mockProjectRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['team', 'tasks'] });
     });
+    it('should throw NotFoundException when project is not found', async () => {
+      mockProjectRepository.findOne.mockResolvedValue(null);
+      await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
+    });
   });
   describe('findByName', () => {
     it('should return a project by name with team and tasks relations', async () => {
@@ -147,7 +151,15 @@ describe('create', () => {
     expect(mockTeamService.findOne).toHaveBeenCalledWith(projectDto.teamId);
     expect(mockProjectRepository.save).toHaveBeenCalledWith(newProject);
   });
-
+  it('should throw an exception if team is not found', async () => {
+    const projectDto = { name: 'New Project', teamId: 999 };
+    
+    mockTeamService.findOne.mockRejectedValue(new NotFoundException('Team not found'));
+    
+    await expect(service.create(projectDto)).rejects.toThrow(NotFoundException);
+    expect(mockTeamService.findOne).toHaveBeenCalledWith(999);
+    expect(mockProjectRepository.save).not.toHaveBeenCalled();
+  });
   it('should throw ConflictException if save operation fails', async () => {
     // Mock data
     const projectDto = { name: 'New Project', teamId: 1 };
@@ -183,17 +195,28 @@ describe('update', () => {
       ...updates,
       team: updatedTeam
     }));
-  
 
-    // Execute the method
     const result = await service.update(id, projectDto);
-
-    // Verify the result
     expect(result).toEqual(updatedProject);
     expect(mockProjectRepository.findOneBy).toHaveBeenCalledWith({ id });
     expect(mockTeamService.findOne).toHaveBeenCalledWith(projectDto.teamId);
     expect(mockProjectRepository.merge).toHaveBeenCalledWith(existingProject, projectDto);
 
+  });
+
+
+  it('should throw NotFoundException when project is not found', async () => {
+    mockProjectRepository.findOneBy.mockResolvedValue(null);
+
+    mockTeamService.findOne.mockResolvedValue({ id: 1, name: 'Team 1' });
+
+    await expect(service.update(999, { name: 'Updated Project', teamId: 1 })).rejects.toThrow(TypeError);
+
+    expect(mockProjectRepository.findOneBy).toHaveBeenCalledWith({ id: 999 });
+    expect(mockTeamService.findOne).toHaveBeenCalledWith(1);
+    
+    expect(mockProjectRepository.merge).not.toHaveBeenCalled();
+    expect(mockProjectRepository.save).not.toHaveBeenCalled();
   });
 
   it('should throw ConflictException if save operation fails', async () => {
