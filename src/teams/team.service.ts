@@ -41,8 +41,8 @@ export class TeamService {
     });
   }
 
-  async create(payload: teamDto) {
-    const newTeam = this.teamRepo.create(payload);
+  async create(name: string) {
+    const newTeam = this.teamRepo.create({ name });
     return await this.teamRepo.save(newTeam).catch((error) => {
       throw new ConflictException(error.detail);
     });

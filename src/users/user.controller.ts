@@ -1,108 +1,96 @@
 import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { MessagePattern, Payload } from '@nestjs/microservices/decorators';
+import { GrpcMethod } from '@nestjs/microservices/decorators';
 
 import { UserService } from './user.service';
-import { userDto } from './user.dto';
 import { UserMSG } from 'src/common/constants';
+import * as grpc from '@grpc/grpc-js';
+
+import { USER_SERVICE_NAME, CreateUserRequest, UserResponse, UsersResponse, UserRequest, UpdateUserRequest,DeleteUserRequest, EmptyRequest} from './../team.pb';
+import { RpcException } from '@nestjs/microservices';
 
 @ApiTags('Users')
 @Controller('api/v1/users')
 export class UserController {
   constructor(private usersService: UserService) {}
 
-  @MessagePattern(UserMSG.FIND_ALL)
-  async findAll() {
+  @GrpcMethod(USER_SERVICE_NAME, UserMSG.CREATE)
+  async createUser(request: CreateUserRequest): Promise<UserResponse> {
     try {
-      const foundUsers = await this.usersService.findAll();
-      return {
-        success: true,
-        message: 'Users found',
-        data: foundUsers,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to found users',
-        error: (error as Record<string, string>)?.message,
-      };
-    }
-  }
-
-  @MessagePattern(UserMSG.FIND_ONE)
-  async findOne(@Payload() id: number) {
-    try {
-      const foundUser = await this.usersService.findOne(id);
-      return {
-        success: true,
-        message: 'User found',
-        data: foundUser,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: 'User not found',
-        error: (error as Record<string, string>)?.message,
-      };
-    }
-  }
-
-  @MessagePattern(UserMSG.CREATE)
-  async create(@Payload() payload: userDto) {
-    try {
-      const createdUser = await this.usersService.create(payload);
+      const createdUser = await this.usersService.create(request);
       console.log('user created');
       return {
-        success: true,
-        message: 'User created succesfully',
-        data: createdUser,
+        user: createdUser,
       };
     } catch (error) {
-      return {
-        success: false,
+      console.error('Failed to create user', error);
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
         message: 'Failed to create user',
-        error: (error as Record<string, string>)?.message,
-      };
+      })
+
     }
   }
 
-  @MessagePattern(UserMSG.UPDATE)
-  async update(@Payload() message: { userName: string; payload: userDto }) {
+  @GrpcMethod(USER_SERVICE_NAME, UserMSG.FIND_ALL)
+  async findAllUsers(): Promise<UsersResponse> {
     try {
-      const updateUser = await this.usersService.update(
-        message.userName,
-        message.payload,
-      );
-      console.log('user updated');
-      return {
-        success: true,
-        message: 'User updated succesfully',
-        data: updateUser,
-      };
+      const users = await this.usersService.findAll();
+      console.log('Found all users');
+      return { users };
     } catch (error) {
-      return {
-        success: false,
+      console.error('Failed to find all users', error);
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to find all users',
+      });
+    }
+  }
+
+  @GrpcMethod(USER_SERVICE_NAME, UserMSG.FIND_ONE)
+  async findOne(request: UserRequest): Promise<UserResponse> {
+    try {
+      const foundUser = await this.usersService.findOne(Number(request.userId));
+      console.log('User found');
+      return { user: foundUser };
+    } catch (error) {
+      console.error('Failed to find user', error);
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'User not found',
+      });
+    }
+  }
+
+  @GrpcMethod(USER_SERVICE_NAME, UserMSG.UPDATE)
+  async update(request: UpdateUserRequest): Promise<UserResponse> {
+    try {
+      const userName = request.userName;
+      const updatedUser = await this.usersService.update(userName, request);
+      console.log('User updated');
+      return { user: updatedUser };
+    } catch (error) {
+      console.error('Failed to update user', error);
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
         message: 'Failed to update user',
-        error: (error as Record<string, string>)?.message,
-      };
+      });
     }
   }
 
-  @MessagePattern(UserMSG.DELETE)
-  async delete(@Payload() userName: string) {
+  @GrpcMethod(USER_SERVICE_NAME, UserMSG.DELETE)
+  async delete(request: DeleteUserRequest): Promise<EmptyRequest> {
     try {
-      const deletedUser = await this.usersService.delete(userName);
-      return {
-        success: true,
-        message: 'User deleted succesfully',
-        data: deletedUser,
-      };
+      const userName = request.userName;
+      const deleteUser = await this.usersService.delete(userName);
+      console.log('User deleted');
+      return {};
     } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to delete user',
-        error: (error as Record<string, string>)?.message,
-      };
+      console.error('Failed to update user', error);
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to update user',
+      });
     }
   }
 }

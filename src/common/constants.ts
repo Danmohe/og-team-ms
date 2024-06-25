@@ -1,7 +1,3 @@
-export enum RabbitMQ {
-  ManagementQueue = 'management',
-}
-
 export enum UserMSG {
   CREATE = 'CREATE_USER',
   FIND_ALL = 'FIND_USERS',

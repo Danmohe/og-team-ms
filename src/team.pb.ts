@@ -10,81 +10,187 @@ import { Observable } from "rxjs";
 
 export const protobufPackage = "team";
 
-export interface FindAllRequest {
+export interface EmptyRequest {
 }
 
-export interface FindOneRequest {
-  id: number;
+export interface Error {
+  code: number;
+  message: string;
 }
 
-export interface FindByUserNameRequest {
+export interface CreateUserRequest {
   userName: string;
 }
 
-export interface CreateRequest {
-  payload: UserPayload | undefined;
+export interface UserRequest {
+  userId: string;
 }
 
-export interface UpdateRequest {
+export interface UpdateUserRequest {
   userName: string;
-  payload: UserPayload | undefined;
+  payload: User | undefined;
 }
 
-export interface DeleteRequest {
+export interface DeleteUserRequest {
   userName: string;
 }
 
-export interface UserPayload {
-  userName: string;
+export interface UserResponse {
+  user: User | undefined;
+}
+
+export interface UsersResponse {
+  users: User[];
 }
 
 export interface User {
-  id: number;
   userName: string;
-  createAt: number;
-  updateAt: number;
-  teamIds: number[];
-  taskIds: number[];
-  commentIds: number[];
 }
 
-export interface Users {
-  users: User[];
+export interface CreateTeamRequest {
+  teamName: string;
+}
+
+export interface TeamRequest {
+  teamId: string;
+}
+
+export interface UpdateTeamRequest {
+  teamId: string;
+  teamName: string;
+}
+
+export interface TeamResponse {
+  team: Team | undefined;
+}
+
+export interface TeamsResponse {
+  teams: Team[];
+}
+
+export interface Team {
+  teamName: string;
+}
+
+export interface CreateProjectRequest {
+  projectName: string;
+}
+
+export interface ProjectRequest {
+  projectId: string;
+}
+
+export interface UpdateProjectRequest {
+  projectId: string;
+  projectName: string;
+}
+
+export interface ProjectResponse {
+  project: Project | undefined;
+}
+
+export interface ProjectsResponse {
+  projects: Project[];
+}
+
+export interface Project {
+  projectName: string;
+  teamId: number;
+}
+
+export interface CreateTaskRequest {
+  taskName: string;
+  projectId: string;
+}
+
+export interface TaskRequest {
+  taskId: string;
+}
+
+export interface UpdateTaskRequest {
+  taskId: string;
+  taskName: string;
+  projectId: string;
+}
+
+export interface TaskResponse {
+  task: Task | undefined;
+}
+
+export interface TasksResponse {
+  tasks: Task[];
+}
+
+export interface Task {
+  taskId: string;
+  taskName: string;
+  description: string;
+  projectId: number;
+}
+
+export interface CreateCommentRequest {
+  commentText: string;
+  taskId: string;
+}
+
+export interface CommentRequest {
+  commentId: string;
+}
+
+export interface UpdateCommentRequest {
+  commentId: string;
+  commentText: string;
+  taskId: string;
+}
+
+export interface CommentResponse {
+  comment: Comment | undefined;
+}
+
+export interface CommentsResponse {
+  comments: Comment[];
+}
+
+export interface Comment {
+  commentId: string;
+  commentText: string;
+  taskId: number;
+  userName: string;
 }
 
 export const TEAM_PACKAGE_NAME = "team";
 
+/** Metodos para user */
+
 export interface UserServiceClient {
-  findAll(request: FindAllRequest): Observable<Users>;
+  createUser(request: CreateUserRequest): Observable<UserResponse>;
 
-  findOne(request: FindOneRequest): Observable<User>;
+  findAllUsers(request: EmptyRequest): Observable<UsersResponse>;
 
-  findByUserName(request: FindByUserNameRequest): Observable<User>;
+  findOneUser(request: UserRequest): Observable<UserResponse>;
 
-  create(request: CreateRequest): Observable<User>;
+  updateUser(request: UpdateUserRequest): Observable<UserResponse>;
 
-  update(request: UpdateRequest): Observable<User>;
-
-  delete(request: DeleteRequest): Observable<User>;
+  deleteUser(request: DeleteUserRequest): Observable<EmptyRequest>;
 }
 
+/** Metodos para user */
+
 export interface UserServiceController {
-  findAll(request: FindAllRequest): Promise<Users> | Observable<Users> | Users;
+  createUser(request: CreateUserRequest): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
-  findOne(request: FindOneRequest): Promise<User> | Observable<User> | User;
+  findAllUsers(request: EmptyRequest): Promise<UsersResponse> | Observable<UsersResponse> | UsersResponse;
 
-  findByUserName(request: FindByUserNameRequest): Promise<User> | Observable<User> | User;
+  findOneUser(request: UserRequest): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
-  create(request: CreateRequest): Promise<User> | Observable<User> | User;
+  updateUser(request: UpdateUserRequest): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
-  update(request: UpdateRequest): Promise<User> | Observable<User> | User;
-
-  delete(request: DeleteRequest): Promise<User> | Observable<User> | User;
+  deleteUser(request: DeleteUserRequest): Promise<EmptyRequest> | Observable<EmptyRequest> | EmptyRequest;
 }
 
 export function UserServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["findAll", "findOne", "findByUserName", "create", "update", "delete"];
+    const grpcMethods: string[] = ["createUser", "findAllUsers", "findOneUser", "updateUser", "deleteUser"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("UserService", method)(constructor.prototype[method], method, descriptor);
@@ -98,3 +204,203 @@ export function UserServiceControllerMethods() {
 }
 
 export const USER_SERVICE_NAME = "UserService";
+
+/** Metodos para team */
+
+export interface TeamServiceClient {
+  createTeam(request: CreateTeamRequest): Observable<TeamResponse>;
+
+  findAllTeams(request: EmptyRequest): Observable<TeamsResponse>;
+
+  findOneTeam(request: TeamRequest): Observable<TeamResponse>;
+
+  updateTeam(request: UpdateTeamRequest): Observable<TeamResponse>;
+
+  deleteTeam(request: TeamRequest): Observable<EmptyRequest>;
+}
+
+/** Metodos para team */
+
+export interface TeamServiceController {
+  createTeam(request: CreateTeamRequest): Promise<TeamResponse> | Observable<TeamResponse> | TeamResponse;
+
+  findAllTeams(request: EmptyRequest): Promise<TeamsResponse> | Observable<TeamsResponse> | TeamsResponse;
+
+  findOneTeam(request: TeamRequest): Promise<TeamResponse> | Observable<TeamResponse> | TeamResponse;
+
+  updateTeam(request: UpdateTeamRequest): Promise<TeamResponse> | Observable<TeamResponse> | TeamResponse;
+
+  deleteTeam(request: TeamRequest): Promise<EmptyRequest> | Observable<EmptyRequest> | EmptyRequest;
+}
+
+export function TeamServiceControllerMethods() {
+  return function (constructor: Function) {
+    const grpcMethods: string[] = ["createTeam", "findAllTeams", "findOneTeam", "updateTeam", "deleteTeam"];
+    for (const method of grpcMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcMethod("TeamService", method)(constructor.prototype[method], method, descriptor);
+    }
+    const grpcStreamMethods: string[] = [];
+    for (const method of grpcStreamMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcStreamMethod("TeamService", method)(constructor.prototype[method], method, descriptor);
+    }
+  };
+}
+
+export const TEAM_SERVICE_NAME = "TeamService";
+
+/** Metodos para project */
+
+export interface ProjectServiceClient {
+  createProject(request: CreateProjectRequest): Observable<ProjectResponse>;
+
+  findAllProjects(request: EmptyRequest): Observable<ProjectsResponse>;
+
+  findOneProject(request: ProjectRequest): Observable<ProjectResponse>;
+
+  updateProject(request: UpdateProjectRequest): Observable<ProjectResponse>;
+
+  deleteProject(request: ProjectRequest): Observable<EmptyRequest>;
+}
+
+/** Metodos para project */
+
+export interface ProjectServiceController {
+  createProject(
+    request: CreateProjectRequest,
+  ): Promise<ProjectResponse> | Observable<ProjectResponse> | ProjectResponse;
+
+  findAllProjects(request: EmptyRequest): Promise<ProjectsResponse> | Observable<ProjectsResponse> | ProjectsResponse;
+
+  findOneProject(request: ProjectRequest): Promise<ProjectResponse> | Observable<ProjectResponse> | ProjectResponse;
+
+  updateProject(
+    request: UpdateProjectRequest,
+  ): Promise<ProjectResponse> | Observable<ProjectResponse> | ProjectResponse;
+
+  deleteProject(request: ProjectRequest): Promise<EmptyRequest> | Observable<EmptyRequest> | EmptyRequest;
+}
+
+export function ProjectServiceControllerMethods() {
+  return function (constructor: Function) {
+    const grpcMethods: string[] = [
+      "createProject",
+      "findAllProjects",
+      "findOneProject",
+      "updateProject",
+      "deleteProject",
+    ];
+    for (const method of grpcMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcMethod("ProjectService", method)(constructor.prototype[method], method, descriptor);
+    }
+    const grpcStreamMethods: string[] = [];
+    for (const method of grpcStreamMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcStreamMethod("ProjectService", method)(constructor.prototype[method], method, descriptor);
+    }
+  };
+}
+
+export const PROJECT_SERVICE_NAME = "ProjectService";
+
+/** Metodos para task */
+
+export interface TaskServiceClient {
+  createTask(request: CreateTaskRequest): Observable<TaskResponse>;
+
+  findAllTasks(request: EmptyRequest): Observable<TasksResponse>;
+
+  findOneTask(request: TaskRequest): Observable<TaskResponse>;
+
+  updateTask(request: UpdateTaskRequest): Observable<TaskResponse>;
+
+  deleteTask(request: TaskRequest): Observable<EmptyRequest>;
+}
+
+/** Metodos para task */
+
+export interface TaskServiceController {
+  createTask(request: CreateTaskRequest): Promise<TaskResponse> | Observable<TaskResponse> | TaskResponse;
+
+  findAllTasks(request: EmptyRequest): Promise<TasksResponse> | Observable<TasksResponse> | TasksResponse;
+
+  findOneTask(request: TaskRequest): Promise<TaskResponse> | Observable<TaskResponse> | TaskResponse;
+
+  updateTask(request: UpdateTaskRequest): Promise<TaskResponse> | Observable<TaskResponse> | TaskResponse;
+
+  deleteTask(request: TaskRequest): Promise<EmptyRequest> | Observable<EmptyRequest> | EmptyRequest;
+}
+
+export function TaskServiceControllerMethods() {
+  return function (constructor: Function) {
+    const grpcMethods: string[] = ["createTask", "findAllTasks", "findOneTask", "updateTask", "deleteTask"];
+    for (const method of grpcMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcMethod("TaskService", method)(constructor.prototype[method], method, descriptor);
+    }
+    const grpcStreamMethods: string[] = [];
+    for (const method of grpcStreamMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcStreamMethod("TaskService", method)(constructor.prototype[method], method, descriptor);
+    }
+  };
+}
+
+export const TASK_SERVICE_NAME = "TaskService";
+
+/** Metodos para comment */
+
+export interface CommentServiceClient {
+  createComment(request: CreateCommentRequest): Observable<CommentResponse>;
+
+  findAllComments(request: EmptyRequest): Observable<CommentsResponse>;
+
+  findOneComment(request: CommentRequest): Observable<CommentResponse>;
+
+  updateComment(request: UpdateCommentRequest): Observable<CommentResponse>;
+
+  deleteComment(request: CommentRequest): Observable<EmptyRequest>;
+}
+
+/** Metodos para comment */
+
+export interface CommentServiceController {
+  createComment(
+    request: CreateCommentRequest,
+  ): Promise<CommentResponse> | Observable<CommentResponse> | CommentResponse;
+
+  findAllComments(request: EmptyRequest): Promise<CommentsResponse> | Observable<CommentsResponse> | CommentsResponse;
+
+  findOneComment(request: CommentRequest): Promise<CommentResponse> | Observable<CommentResponse> | CommentResponse;
+
+  updateComment(
+    request: UpdateCommentRequest,
+  ): Promise<CommentResponse> | Observable<CommentResponse> | CommentResponse;
+
+  deleteComment(request: CommentRequest): Promise<EmptyRequest> | Observable<EmptyRequest> | EmptyRequest;
+}
+
+export function CommentServiceControllerMethods() {
+  return function (constructor: Function) {
+    const grpcMethods: string[] = [
+      "createComment",
+      "findAllComments",
+      "findOneComment",
+      "updateComment",
+      "deleteComment",
+    ];
+    for (const method of grpcMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcMethod("CommentService", method)(constructor.prototype[method], method, descriptor);
+    }
+    const grpcStreamMethods: string[] = [];
+    for (const method of grpcStreamMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcStreamMethod("CommentService", method)(constructor.prototype[method], method, descriptor);
+    }
+  };
+}
+
+export const COMMENT_SERVICE_NAME = "CommentService";

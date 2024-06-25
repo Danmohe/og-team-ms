@@ -1,106 +1,100 @@
 import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { MessagePattern, Payload } from '@nestjs/microservices/decorators';
+import { GrpcMethod, MessagePattern, Payload } from '@nestjs/microservices/decorators';
 
 import { TeamService } from './team.service';
-import { teamDto } from './team.dto';
 import { TeamMSG } from 'src/common/constants';
+import * as grpc from '@grpc/grpc-js';
+
+import { CreateTeamRequest, EmptyRequest, TEAM_SERVICE_NAME, TeamRequest, TeamResponse, TeamsResponse, UpdateTeamRequest } from 'src/team.pb';
+import { RpcException } from '@nestjs/microservices';
 
 @ApiTags('Teams')
 @Controller('api/v1/teams')
 export class TeamController {
   constructor(private teamsService: TeamService) {}
 
-  @MessagePattern(TeamMSG.FIND_ALL)
-  async findAll() {
+  /*
+  @GrpcMethod(TEAM_SERVICE_NAME, TeamMSG.FIND_ALL)
+  async FindAll(): Promise<TeamsResponse> {
     try {
-      const foundTeams = await this.teamsService.findAll();
-      return {
-        success: true,
-        message: 'Teams found',
-        data: foundTeams,
-      };
+      const teams = await this.teamsService.findAll();
+      console.log('Found all teams');
+      return { teams: teams };
     } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to found teams',
-        error: (error as Record<string, string>)?.message,
-      };
+      console.error('Failed to find all teams', error);
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to find all teams',
+      });
     }
   }
 
-  @MessagePattern(TeamMSG.FIND_ONE)
-  async findOne(@Payload() id: number) {
+  @GrpcMethod(TEAM_SERVICE_NAME, TeamMSG.FIND_ONE)
+  async findOne(request: TeamRequest): Promise<TeamResponse> {
     try {
-      const foundTeam = await this.teamsService.findOne(id);
-      return {
-        success: true,
-        message: 'Team found',
-        data: foundTeam,
-      };
+      const foundTeam = await this.teamsService.findOne(Number(request.teamId));
+      console.log('team found');
+      return { team: foundTeam };
     } catch (error) {
-      return {
-        success: false,
+      console.error('Failed to find team', error);
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
         message: 'Team not found',
-        error: (error as Record<string, string>)?.message,
-      };
+      });
     }
   }
+  */
 
-  @MessagePattern(TeamMSG.CREATE)
-  async create(@Payload() payload: teamDto) {
+  @GrpcMethod(TEAM_SERVICE_NAME, TeamMSG.CREATE)
+  async createUser(request: CreateTeamRequest): Promise<TeamResponse> {
     try {
-      const createdTeam = await this.teamsService.create(payload);
+      const createdTeam = await this.teamsService.create(request.teamName);
+      console.log('team created');
       return {
-        success: true,
-        message: 'Team created succesfully',
-        data: createdTeam,
+        team: request,
       };
     } catch (error) {
-      return {
-        success: false,
+      console.error('Failed to create team', error);
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
         message: 'Failed to create team',
-        error: (error as Record<string, string>)?.message,
-      };
+      })
+
     }
   }
 
-  @MessagePattern(TeamMSG.UPDATE)
-  async update(@Payload() message: { id: number; payload: teamDto }) {
+  /*
+  @GrpcMethod(TEAM_SERVICE_NAME, TeamMSG.UPDATE)
+  async update(request: UpdateTeamRequest): Promise<TeamResponse> {
     try {
-      const updateTeam = await this.teamsService.update(
-        message.id,
-        message.payload,
-      );
-      return {
-        success: true,
-        message: 'Team updated succesfully',
-        data: updateTeam,
-      };
+      const teamId = request.teamId;
+      const updatedTeam = await this.teamsService.update(Number(teamId), request);
+      console.log('Team updated');
+      return { team: updatedTeam };
     } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to update team',
-        error: (error as Record<string, string>)?.message,
-      };
+      console.error('Failed to update user', error);
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to update user',
+      });
     }
   }
+    */
 
-  @MessagePattern(TeamMSG.DELETE)
-  async delete(@Payload() id: number) {
+  @GrpcMethod(TeamMSG.DELETE)
+  async delete(request: TeamRequest): Promise<EmptyRequest> {
     try {
-      const deletedTeam = await this.teamsService.delete(id);
-      return {
-        success: true,
-        message: 'Team deleted succesfully',
-        data: deletedTeam,
-      };
+      const teamId = request.teamId;
+      const deleteTeam = await this.teamsService.delete(Number(teamId));
+      console.log('User deleted');
+      return {};
     } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to delete team',
-        error: (error as Record<string, string>)?.message,
-      };
+      console.error('Failed to update user', error);
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to update user',
+      });
     }
   }
 
